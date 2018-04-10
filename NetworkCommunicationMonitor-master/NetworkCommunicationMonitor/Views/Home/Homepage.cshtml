@@ -1,0 +1,1302 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Network Communication Monitor</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" media="screen" />
+    <link rel="Bookmark" href="~/favicon.ico" />
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="~/assets/plugins/bootstrap/css/bootstrap.min.css">
+    <!-- Fonts  -->
+    <link rel="stylesheet" href="~/assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/assets/css/simple-line-icons.css">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="~/assets/css/animate.css">
+    <!-- Daterange Picker -->
+    <link rel="stylesheet" href="~/assets/plugins/daterangepicker/daterangepicker-bs3.css">
+    <!-- Switchery -->
+    <link rel="stylesheet" href="~/assets/plugins/switchery/switchery.min.css">
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="~/assets/css/main.css">
+    <!-- Rewrtite CSS-->
+    <link rel="stylesheet" href="~/css/style.css">
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Monda" rel="stylesheet">
+    <!-- Feature detection -->
+    <script src="~/assets/js/vendor/modernizr-2.6.2.min.js"></script>
+    <!-- Cytoscape.css -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="assets/js/vendor/html5shiv.js"></script>
+    <script src="assets/js/vendor/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <section id="main-wrapper" class="theme-default">
+        <header id="header">
+            <!--logo start-->
+            <div class="brand">
+                <a href="~/Home/Homepage" class="logo">
+                    <i class="fa fa-desktop"></i>
+                    <span>Network</span>Monitor
+                </a>
+            </div>
+            <!--logo end-->
+            <ul class="nav navbar-nav navbar-left">
+                <li class="toggle-navigation toggle-left">
+                    <button class="sidebar-toggle" id="toggle-left">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </li>
+                <li class="hidden-xs hidden-sm">
+                    <input type="text" class="search" placeholder="Search project...">
+                    <button type="submit" class="btn btn-sm btn-search">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown profile hidden-xs">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="meta">
+                            <span class="text">@Session["username"]</span>
+                            <span class="caret"></span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight" role="menu">
+                        <br />
+                        <li>
+                            <a href="javascript:void(0);">
+                                <span class="icon">
+                                    <i class="fa fa-user"></i>
+                                </span>My Account
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                                <span class="icon">
+                                    <i class="fa fa-cog"></i>
+                                </span>Settings
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="Index">
+                                <span class="icon">
+                                    <i class="fa fa-sign-out"></i>
+                                </span>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="toggle-fullscreen hidden-xs">
+                    <button type="button" class="btn btn-default expand" id="toggle-fullscreen">
+                        <i class="fa fa-expand"></i>
+                    </button>
+                </li>
+            </ul>
+        </header>
+        <!--sidebar left start-->
+        <aside class="sidebar sidebar-left">
+            <div class="sidebar-profile">
+                <div class="profile-body dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><h4>@Session["username"] <span class="caret"></span></h4></a>
+                    <ul class="dropdown-menu animated fadeInRight" role="menu">
+                        <li>
+                            <a href="javascript:void(0);">
+                                <span class="icon">
+                                    <i class="fa fa-user"></i>
+                                </span>My Account
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                                <span class="icon">
+                                    <i class="fa fa-cog"></i>
+                                </span>Settings
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="Index">
+                                <span class="icon">
+                                    <i class="fa fa-sign-out"></i>
+                                </span>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <nav>
+                <h5 class="sidebar-header">Navigation</h5>
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active">
+                        <a href="#" title="Network">
+                            <i class="fa fa-fw fa-share-alt"></i> Network
+                        </a>
+                    </li>
+                    <li class="nav-dropdown">
+                        <a href="Account" title="Account">
+                            <i class="fa  fa-fw fa-user"></i> Account
+                            <span class="label label-primary label-circle pull-right">@ViewData["NumAccounts"]</span>
+                        </a>
+                    </li>
+                    <li class="nav-dropdown">
+                        <a href="Card" title="Credit Card">
+                            <i class="fa  fa-fw fa-credit-card"></i> Credit Card
+                            <span class="label label-primary label-circle pull-right">@ViewData["NumCards"]</span>
+                        </a>
+                    </li>
+                    <li class="nav-dropdown">
+                        <a href="Store" title="Stores">
+                            <i class="fa  fa-fw fa-home"></i> Stores
+                            <span class="label label-primary label-circle pull-right">@ViewData["NumStores"]</span>
+                        </a>
+                    </li>
+                    <li class="nav-dropdown">
+                        <a href="Station" title="Relay Stations">
+                            <i class="fa  fa-fw fa-flag-checkered"></i> Relay Stations
+                            <span class="label label-primary label-circle pull-right">@ViewData["NumRelays"]</span>
+                        </a>
+                    </li>
+                    <li class="nav-dropdown">
+                        <a href="Transaction" title="Transactions">
+                            <i class="fa  fa-fw fa-exchange"></i> Transactions
+                            <span class="label label-primary label-circle pull-right">@ViewData["NumTransactions"]</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <!--sidebar left end-->
+        <!--main content start-->
+        <section class="main-content-wrapper">
+            <div class="pageheader">
+                <h1>Network<span class="description" style="font-size:0.6em">  Welcome to Network Communication Monitor</span></h1>
+                <div class="breadcrumb-wrapper hidden-xs">
+                    <span class="label">You are here:</span>
+                    <ol class="breadcrumb">
+                        <li class="active">Network</li>
+                    </ol>
+                </div>
+            </div>
+            <section id="main-content" class="animated fadeInUp">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-12">
+                        <div class="row">
+                            <div class="col-md-2 col-md-offset-1">
+                                <a href="Account">
+                                    <div class="panel panel-solid-success widget-mini">
+                                        <div class="panel-body">
+                                            <i class="fa fa-user"></i>
+                                            <span class="total text-center">@ViewData["NumAccounts"]</span>
+                                            <span class="title text-center">Accounts</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="Card">
+                                    <div class="panel widget-mini">
+                                        <div class="panel-body">
+                                            <i class="fa fa-credit-card"></i>
+                                            <span class="total text-center">@ViewData["NumCards"]</span>
+                                            <span class="title text-center">Credit Cards</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="Store">
+                                    <div class="panel panel-solid-info widget-mini">
+                                        <div class="panel-body">
+                                            <i class="fa fa-home"></i>
+                                            <span class="total text-center">@ViewData["NumStores"]</span>
+                                            <span class="title text-center">Stores</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="Station">
+                                    <div class="panel widget-mini">
+                                        <div class="panel-body">
+                                            <i class="fa fa-flag-checkered"></i>
+                                            <span class="total text-center">@ViewData["NumRelays"]</span>
+                                            <span class="title text-center">Relay Stations</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="Transaction">
+                                    <div class="panel panel-solid-warning widget-mini">
+                                        <div class="panel-body">
+                                            <i class="fa  fa-fw fa-exchange"></i>
+                                            <span class="total text-center">@ViewData["NumTransactions"]</span>
+                                            <span class="title text-center">Transactions</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!--SVG start-->
+            <div id="network-view">
+                <div id="operation">
+                    <div class="svg-expand pointer">
+                        <i class="fa fa-fw fa-expand" title="Fullscreen"></i>
+                        <i class="fa fa-fw fa-home" data-toggle="modal" data-target="#add-store" title="Create Store"></i>
+                        <i class="fa fa-fw fa-flag-checkered" data-toggle="modal" data-target="#add-relay" title="Create Relay"></i>
+                        <i class="fa fa-fw fa-th-large" data-toggle="modal" data-target="#add-region" title="Create Region"></i>
+                        <i class="fa fa-fw fa-arrows-h" data-toggle="modal" data-target="#add-connection" title="Create Connection"></i>
+                        <i class="fa fa-exchange" data-toggle="modal" data-target="#add-transaction" title="Create Transaction"></i>
+                        <i class="fa fa-play hidden" id="play" title="Play"></i>
+                        <i class="fa fa-fw fa-pause " id="pause" title="Pause"></i>
+                    </div>
+                    <div class="notation pull-right">
+                        <ul class="list-inline list-unstyled">
+                            <li><span class="process-label"></span>Processing Center</li>
+                            <li><span class="relay-label"></span>Relay Station</li>
+                            <li><span class="store-label"></span>Store</li>
+                            <li><span class="inactive-label"></span>Inactive</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="cy" class="animated"></div>
+                <!--add relay start-->
+                @using (Html.BeginForm("AddRelay", "Home", FormMethod.Post))
+                {
+                    <div class="modal fade" id="add-relay" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h1 class="modal-title" id="myModalLabel"><strong> Add a Relay Station</strong></h1>
+                                </div>
+                                <div class="modal-body">
+                                    <!--main content start-->
+                                    <section class="main-content-wrapper" style="padding:0">
+                                        <section id="main-content" class="animated fadeInUp">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <h2 style="text-align:center; margin: -10px 0 15px 0;">Relay Info</h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal">
+                                                                <div class="form-group">
+                                                                    <label for="relayWeight" class="col-sm-4 control-label">Weight</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="relayWeight" name="relayWeight" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="relayIpAddress" class="col-sm-4 control-label">IP Address</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="relayIpAddress" name="relayIpAddress" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="relayIpConnectedTo" class="col-sm-4 control-label">Connect To</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="relayIpConnectedTo" name="relayIpConnectedTo" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input type="submit" class="btn btn-success btn-block" value="Add To Network" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                    <!--main content end-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <!--add relay end-->
+                <!--add region start-->
+                @using (Html.BeginForm("AddRegion", "Home", FormMethod.Post))
+                {
+                    <div class="modal fade" id="add-region" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h1 class="modal-title" id="myModalLabel"><strong> Add a Region</strong></h1>
+                                </div>
+                                <div class="modal-body">
+                                    <!--main content start-->
+                                    <section class="main-content-wrapper" style="padding:0">
+                                        <section id="main-content" class="animated fadeInUp">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <h2 style="text-align:center; margin: -10px 0 15px 0;">Region Info</h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal">
+                                                                <div class="form-group">
+                                                                    <label for="region-name" class="col-sm-4 control-label">Region Name</label>
+                                                                    <div class="col-sm-6">
+                                                                        <input type="text" class="form-control" id-="region-name" name="region-name" required minlength="1" maxlength="15" placeholder="Region Name">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="gateway-ipAddress" class="col-sm-4 control-label">Gateway IP Address</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="gateway-ipAddress" name="gateway-ipAddress" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="gateway-relay" class="col-sm-4 control-label">Gateway - Relay</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="gateway-relay" name="gateway-relay" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="relay-ipaddress" class="col-sm-4 control-label">Relay IP Address</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="relay-ipAddress" name="relay-ipAddress" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="store-name" class="col-sm-4 control-label">Store Name</label>
+                                                                    <div class="col-sm-6">
+                                                                        <input type="text" class="form-control" id="store-name" name="store-name" required minlength="1" maxlength="15" placeholder="Store Name">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="store-relay" class="col-sm-4 control-label">Store-Relay</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="store-relay" name="store-relay" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="store-ipaddress" class="col-sm-4 control-label">Store IP Address</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="store-ipAddress" name="store-ipAddress" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input type="submit" class="btn btn-success btn-block" value="Add To Network" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                    <!--main content end-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <!--add region end-->
+                <!--add store start-->
+                @using (Html.BeginForm("AddStore", "Home", FormMethod.Post))
+                {
+                    <div class="modal fade" id="add-store" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h1 class="modal-title" id="myModalLabel"><strong> Add a Store</strong></h1>
+                                </div>
+                                <div class="modal-body">
+                                    <!--main content start-->
+                                    <section class="main-content-wrapper" style="padding:0">
+                                        <section id="main-content" class="animated fadeInUp">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <h2 style="text-align:center; margin: -10px 0 15px 0;">Store Info</h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal">
+                                                                <div class="form-group">
+                                                                    <label for="storeName" class="col-sm-4 control-label">Store Name</label>
+                                                                    <div class="col-sm-6">
+                                                                        <input type="text" class="form-control" id="storeName" name="storeName" required minlength="1" maxlength="15" placeholder="Store Name">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="storeWeight" class="col-sm-4 control-label">Weight</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="storeWeight" name="storeWeight" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="storeIpAddress" class="col-sm-4 control-label">IP Address</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="storeIpAddress" name="storeIpAddress" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="storeIpConnectedTo" class="col-sm-4 control-label">Relay To Connect</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="storeIpConnectedTo" name="storeIpConnectedTo" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input type="submit" class="btn btn-success btn-block" value="Add To Network" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                    <!--main content end-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <!--add store end-->
+                <!--add connection start-->
+                @using (Html.BeginForm("AddConnection", "Home", FormMethod.Post))
+                {
+                    <div class="modal fade" id="add-connection" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h1 class="modal-title" id="myModalLabel"><strong> Add a Connection</strong></h1>
+                                </div>
+                                <div class="modal-body">
+                                    <!--main content start-->
+                                    <section class="main-content-wrapper" style="padding:0">
+                                        <section id="main-content" class="animated fadeInUp">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <h2 style="text-align:center; margin: -10px 0 15px 0;">Connection Info</h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal">
+                                                                <div class="form-group">
+                                                                    <label for="connectionWeight" class="col-sm-4 control-label">Weight</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="connectionWeight" name="connectionWeight" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="ipOne" class="col-sm-4 control-label">IP Address One</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="ipOne" name="ipOne" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="ipTwo" class="col-sm-4 control-label">IP Address Two</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="ipTwo" name="ipTwo" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input type="submit" class="btn btn-success btn-block" value="Add To Network" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                    <!--main content end-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <!--add connection end-->
+                <!-- add transaction start-->
+                @*@using (Html.BeginForm("AddTransaction", "Home", FormMethod.Post))
+                {*@
+                    <div class="modal fade" id="add-transaction" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" id="close-transaction" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h1 class="modal-title" id="myModalLabel"><strong> Create a Transaction</strong></h1>
+                                </div>
+                                <div class="modal-body">
+                                    <!--main content start-->
+                                    <section class="main-content-wrapper" style="padding:0">
+                                        <section id="main-content" class="animated fadeInUp">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <h2 style="text-align:center; margin: -10px 0 15px 0;">Transaction Info</h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal">
+                                                                <div class="form-group">
+                                                                    <label for="transactionIPAddress" class="col-sm-4 control-label">IP Address of Store</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="transactionIPAddress" name="transactionIPAddress" style="padding:0;"></select>
+                                                                    </div>
+                                                                </div>
+                                                            @{
+                                                                List<NetworkCommunicationMonitor.Models.Card> cards = (List<NetworkCommunicationMonitor.Models.Card>)ViewData["Cards"];
+                                                                <div class="form-group">
+                                                                    <label for="transactionCardNumber" class="col-sm-4 control-label">Card number</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" id="transactionCardNumber" name="transactionCardNumber" style="padding:0;">
+                                                                        @{
+                                                                            foreach (NetworkCommunicationMonitor.Models.Card card in cards)
+                                                                            {
+                                                                            @*<input type="text" class="form-control" id="transactionCardNumber" name="transactionCardNumber" placeholder="Card number" maxlength="19" onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,'')" required />*@
+                                                                            <option>@card.cardNumber</option>
+                                                                                }
+                                                                            }
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                                <div class="form-group">
+                                                                    <label for="transactionAmount" class="col-sm-4 control-label">Transaction Amount</label>
+                                                                    <div class="col-sm-6">
+                                                                        @*<input type="text" class="form-control" id="transactionAmount" name="transactionAmount" required minlength="1" maxlength="6" placeholder="$0.00" onkeyup="value = value.replace(/[^\d]/g, ''); if ( value > 25000) { value = 25000; }" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,'')">*@
+                                                                        <input type="text" class="form-control" id="transactionAmount" name="transactionAmount" required minlength="1" maxlength="6" placeholder="$0.00" onkeyup="if ( value > 25000) { value = 25000; }" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,'')">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="transactionDate" class="col-sm-4 control-label">Transaction Date</label>
+                                                                    <div class="col-sm-6">
+                                                                        <input type="text" class="form-control" id="transactionDate" name="transactionDate" required minlength="10" maxlength="10" placeholder="MM/DD/YYYY">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="transactionCategory" class="col-sm-4 control-label">Transaction Category</label>
+                                                                    <div class="col-sm-6">
+                                                                        <select class="form-control" style="padding:0;" id="transactionCategory" name="transactionCategory">
+                                                                            <option>Credit</option>
+                                                                            <option>Debit</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <input id="transactionSubmit" type="submit" class="btn btn-success btn-block" value="Add To Network" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                    <!--main content end-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @*}*@
+                <!-- add transaction end-->
+            </div>
+        </section>
+        <!--main content end-->
+    </section>
+    <!--Config demo-->
+    <div id="config" class="config hidden-xs">
+        <h4>Settings<a href="javascript:void(0)" class="config-link closed"><i class="icon-settings"></i></a></h4>
+        <div class="config-swatch-wrap">
+            <div class="row">
+                <div class="col-xs-6">
+                    <ul class="options">
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-default">
+                                <span class="header bg-white"></span>
+                                <span class="header bg-white"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-dark">
+                                <span class="header bg-dark"></span>
+                                <span class="header bg-white"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-blue">
+                                <span class="header bg-info"></span>
+                                <span class="header bg-white"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-blue-full">
+                                <span class="header bg-info"></span>
+                                <span class="header bg-info"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-grey">
+                                <span class="header bg-grey"></span>
+                                <span class="header bg-white"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-grey-full">
+                                <span class="header bg-grey"></span>
+                                <span class="header bg-grey"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-6">
+                    <ul class="options">
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-dark-full">
+                                <span class="header bg-dark"></span>
+                                <span class="header bg-dark"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-green">
+                                <span class="header bg-green"></span>
+                                <span class="header bg-white"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-green-full">
+                                <span class="header bg-green"></span>
+                                <span class="header bg-green"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-red">
+                                <span class="header bg-red"></span>
+                                <span class="header bg-white"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-red-full">
+                                <span class="header bg-red"></span>
+                                <span class="header bg-red"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="theme-style-wrapper" data-theme="theme-dark-blue-full">
+                                <span class="header bg-dark-blue"></span>
+                                <span class="header bg-dark-blue"></span>
+                                <span class="nav bg-dark"></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/Config demo-->
+    <!--Global JS-->
+    <script src="~/assets/js/vendor/jquery-1.11.1.min.js"></script>
+    <script src="~/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/assets/plugins/navgoco/jquery.navgoco.min.js"></script>
+    <script src="~/assets/plugins/pace/pace.min.js"></script>
+    <script src="~/assets/plugins/fullscreen/jquery.fullscreen-min.js"></script>
+    <script src="~/assets/js/src/app.js"></script>
+    <!--Page Level JS-->
+    <script src="~/assets/plugins/mask/js/jquery.maskedinput.min.js"></script>
+    <!-- ChartJS  -->
+    <script src="~/assets/plugins/chartjs/Chart.min.js"></script>
+    <!-- Morris  -->
+    <script src="~/assets/plugins/morris/js/morris.min.js"></script>
+    <script src="~/assets/plugins/morris/js/raphael.2.1.0.min.js"></script>
+    <!-- Switch -->
+    <script src="~/assets/plugins/switchery/switchery.min.js"></script>
+    <!-- Cytoscape.js -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.10/cytoscape.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.js"></script>
+    <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-qtip/2.7.0/cytoscape-qtip.js"></script>
+    <script src="~/js/cytoscape-cose-bilkent.js"></script>
+    <!-- Cytoscape-->
+    <script>
+        $(function () { // on dom ready
+
+            const nodes = @Html.Raw(Json.Encode(ViewData["Nodes"]));
+            const edges = @Html.Raw(Json.Encode(ViewData["Links"]));
+            const data = [];
+            const relayColor = 'green';
+            const WEIGHTOFFSET = 100000000; // This is used to inactivate relays/connections and to prevent a path from routing through a store
+
+            var storeIds = [];
+            var relayIds = [];
+            var connectionIds = [];
+
+            var storeList = [];
+            var relayList = [];
+            var gatewayList = [];
+            var ipSet = []; // from 192.168.0.1 to 192.168.0.254
+            var existIpSet = []; // ip addresses include both stores and relays
+            var remainIpSet = []; // ip addresses not include stores and relays
+            var currentAnimations = [];
+            var currentAnimationSet = new Set();
+            var animationsArePaused = false;
+
+            convertElements();
+            getRemainingIp();
+            validateInput();
+
+            //console.log("storeList:", storeList);
+            //console.log("relayList:", relayList);
+            //console.log("ipSet:", ipSet);
+            //console.log("existIpSet:", existIpSet);
+            //console.log("remainIpSet:", remainIpSet);
+
+            var cy = cytoscape({
+                ready: function () { window.cy = this; },
+
+                container: document.getElementById('cy'), // container to render in
+
+                elements: data,
+
+                layout: {
+                    name: 'cose-bilkent',
+                    animate: true,
+                },
+                style: cytoscape.stylesheet() // the stylesheet for the graph
+                    .selector("node[category != '0']")
+                    .css({
+                        'label': 'data(id)',
+                        'width': 'data(width)',
+                        'height': 'data(height)',
+                        'shape': 'data(shape)',
+                        'background-color': 'data(color)',
+                        'border-width': '3px',
+                        'border-color': 'black'
+                    })
+                    .selector('edge')
+                    .css({
+                        'width': 3,
+                        'label': 'data(weight)',
+                        'line-color': 'gray',
+                    })
+                    .selector("node[category='0']")
+                    .css({
+                        'label': ' ',
+                        'border-width': '2px',
+                        'border-color': 'black',
+                        'background-color': 'data(color)',
+                        'background-opacity': 0.2
+                    })
+                    .selector("node[status='inactive']")
+                    .css({
+                        'border-color': 'black',
+                        'background-color': 'black',
+                        'opacity': '1'
+                    })
+                    .selector('edge:selected')
+                    .css({
+                        //'border-color': 'black',
+                        //'background-color': 'black',
+                        //'line-color': 'black',
+                        //'target-arrow-color': 'black',
+                        //'source-arrow-color': 'black',
+                        //'width': '5px',
+                        //'height': '5px',
+                        //'opacity': '1'
+                    })
+                    .selector('node:selected')
+                    .css({
+                        //'border-color': 'black',
+                        //'background-color': 'black',
+                        //'opacity': '1'
+                    }),
+                //.selector('.outline')
+                //.css({
+                //    "text-outline-color": '#e6e6e6',
+                //    "text-outline-width": 3
+                //}),
+                zoom: 1,
+                pan: { x: 0, y: 0 },
+                minZoom: 1e-1,
+                maxZoom: 1e1,
+                wheelSensitivity: 0.2
+            });
+
+            //This handles deactivating of relays
+            cy.on('click', 'node', function (evt) {
+                popOver(this);
+            });
+            cy.on('click', 'edge', function (evt) {
+                tryLockNetworkElement(this);
+            });
+
+            function tryLockNetworkElement(element) {
+                if (relayIds.includes(element.data('id')) || connectionIds.includes(element.data('connectionId')))
+                    if (element.data('isActive') == true) {
+                        console.log('locking: ' + element.id());
+                        element.data('status', 'inactive');
+                        element.animation({
+                            style: {
+                                'background-color': 'black',
+                                'line-color': 'black'
+                            },
+                            duration: 500
+                        }).play();
+                        var connectedEdges = element.connectedEdges();
+                        for (var i = 0; i < connectedEdges.length; i++) {
+                            weight = connectedEdges[i].data('activeWeight');
+                            connectedEdges[i].data('activeWeight', weight + WEIGHTOFFSET)
+                        }
+                        element.data('isActive', false);
+                    } else {
+                        console.log("unlocking: " + element.id());
+                        element.data('status', 'active');
+                        element.animation({
+                            style: {
+                                'background-color': relayColor,
+                                'line-color': 'grey'
+                            },
+                            duration: 500
+                        }).play();
+                        var connectedEdges = element.connectedEdges();
+                        for (var i = 0; i < connectedEdges.length; i++) {
+                            weight = connectedEdges[i].data('activeWeight');
+                            connectedEdges[i].data('activeWeight', weight - WEIGHTOFFSET)
+                        }
+                        element.data('isActive', true);
+                    }
+            }
+
+            /*=====================================================================================================
+                                                        Core Functions
+            ======================================================================================================*/
+            function handleTransaction() {
+                //Collect values
+                var transaction = new Object();
+                transaction.cardNumber = $('#transactionCardNumber').val();
+                var transactionStart = $('#transactionIPAddress').val();
+                transaction.storeIP = transactionStart;
+                transaction.transactionDate = $('#transactionDate').val();
+                transaction.amount = $('#transactionAmount').val();
+                transaction.category = $('#transactionCategory').val();
+
+                //Database insertion
+                $.ajax({
+                    method: "POST",
+                    url: "/Home/AddTransaction",
+                    data: transaction,
+                    success: (result) => {
+                        closeClick(transaction);
+                        console.log("Successful ajax request: ")
+                        transaction.transactionID = result;
+                        console.log("Transaction ID: " + result);
+                        return transaction;
+                    },
+                    error: (result) => {
+                        console.log("Error on ajax request");
+                        console.log(result);
+                    }
+                });
+            }
+
+            // Will be used to handle what happens at the processing center
+            function process(hasProcessed) {
+                animPath(processingCenter, startNode, true);
+            }
+
+            function assembleAnim(storeNode, transaction) {
+                console.log("Assembling animation")
+
+                var processingCenter = getNode("@NetworkCommunicationMonitor.Models.Relay.PROCESSINGCENTERIP");
+                var path = getPath(storeNode, processingCenter);
+                var n = cy.nodes();
+                var animationList = []
+                // Assemble list of animations
+                for (var i = 0; i < path.length; i++) {
+                    // If an inactive edge is in the path, we will drop the packet.
+                    // An edge is inactive if the activeWeight is >= the WEIGHTOFFSET
+                    var elementIsActive = path[i].data('isActive');
+                    //var shouldDropPacket = (i > 1 && i < path.length - 2) || !elementIsActive;
+                    if (!elementIsActive) {
+                        break;
+                    } else {
+                        var animation = path[i].animation({
+                            style: {
+                                'background-color': 'red',
+                                'line-color': 'red',
+                                'width': '10px',
+                                'height': '10px'
+                            },
+                            duration: 1000
+                        });
+                        animation['paused'] = false;
+                        animation['node'] = path[i];
+                        animationList.push(animation);
+                    }
+                }
+
+                currentAnimations.push(animationList);
+                newAnim(animationList, 0);
+            }
+
+            function convertElements() {
+                let temp = [];
+                let arr = [];
+                let status;
+
+                // Convert Nodes
+                for (var i = 0; i < nodes.length; i++) {
+                    temp.push(nodes[i].region);
+                    let tempId = nodes[i].id.slice(10);
+
+                    if (nodes[i].group == 0) {  // Processing center
+                        data.push({ group: 'nodes', data: { id: tempId, color: 'orange', shape: 'barrel', width: '50', height: '50', category: '1', queue: [], isActive: true } });
+                    } else if (nodes[i].group == 1) {   // Store
+                        storeIds.push(tempId);
+                        storeList.push(tempId);
+                        data.push({ group: 'nodes', data: { id: tempId, color: 'blueviolet', shape: 'ellipse', width: '20', height: '20', category: '3', parent: nodes[i].region, isActive: true } });
+                    } else if (nodes[i].group == 2) {   // Relay
+                        relayIds.push(tempId);
+                        relayList.push(tempId);
+                        if (nodes[i].isActive) { status = 'active'; } else { status = 'inactive'; }
+                        data.push({ group: 'nodes', data: { id: tempId, color: 'green', shape: 'triangle ', width: '35', height: '35', category: '2', status: status, parent: nodes[i].region, queue: [], isActive: true } });
+                    }
+                }
+                arr = unique(temp);
+                arr.sort();
+                for (var i = 0; i < arr.length; i++) { // Region
+                    data.push({ group: 'nodes', data: { id: arr[i], color: 'white', shape: 'rectangle', width: '0', height: '0', category: '0' } });
+                }
+
+                // Convert Edges
+                for (var i = 0; i < edges.length; i++) { // Edges
+                    let sourceId = edges[i].source.slice(10);
+                    let targetId = edges[i].target.slice(10);
+                    var tempId = edges[i].id
+                    connectionIds.push(tempId)
+                    if (storeIds.includes(sourceId) || storeIds.includes(targetId)) {
+                        data.push({ group: 'edges', data: { source: sourceId, target: targetId, weight: edges[i].distance, activeWeight: (edges[i].distance + WEIGHTOFFSET * 2), isActive: true, queue: [], connectionId: tempId } });
+                    } else {
+                        data.push({ group: 'edges', data: { source: sourceId, target: targetId, weight: edges[i].distance, activeWeight: edges[i].distance, isActive: true, queue: [], connectionId: tempId } });
+                    }
+                }
+            }
+
+            /*=====================================================================================================
+                                                        Animations
+            ======================================================================================================*/
+
+            // Play the animation and try to continue
+            function newAnim(animationList, currentAnimationPlayingIndex) {
+                var animation = animationList[currentAnimationPlayingIndex];
+                currentAnimationSet.add(animation);
+                if (!animationsArePaused) {
+                    animation.play();
+                }
+                animation.promise('completed').then(function () {
+                    animation
+                        .reverse()
+                        .rewind()
+                        .play();
+
+                    currentAnimationSet.delete(animation);
+                    console.log("Animating a node");
+                    if (currentAnimationPlayingIndex < animationList.length - 1) {
+                        currentAnimationPlayingIndex += 1;
+                        newAnim(animationList, currentAnimationPlayingIndex);
+                    }
+                });
+            }
+
+            /*=====================================================================================================
+                                                        Click Events
+            ======================================================================================================*/
+
+            $('#transactionSubmit').click(function () {
+                var transaction = handleTransaction();
+            });
+
+            $('#pause').click(function () {
+                pauseOrPlayAnimations();
+            });
+
+            $('#play').click(function () {
+                pauseOrPlayAnimations();
+            });
+
+            function pauseOrPlayAnimations(node) {
+                if (animationsArePaused) {
+                    animationsArePaused = false;
+                    currentAnimationSet.forEach(function (animation) { animation.play() })
+                    $("#play").addClass('hidden');
+                    $("#pause").removeClass('hidden');
+                } else {
+                    animationsArePaused = true;
+                    currentAnimationSet.forEach(function (animation) { animation.pause() })
+                    $("#pause").addClass('hidden');
+                    $("#play").removeClass('hidden');
+                }
+            }
+
+            function closeClick(transaction) {
+                $('#close-transaction').click();
+                var transactionStart = $('#transactionIPAddress').val();
+                var startNode = getNode(transactionStart);
+                assembleAnim(startNode, transaction);
+            }
+
+            function popOver(element) {
+                cy.elements("node[category= '2']").qtip({
+                    content: {
+                        text: function () {
+                            var $menuContents = $('<div> Queue:' + element.data('queue').toString() + '</div>');
+                            var $ctr = $('<div class="select-buttons"></div>');
+                            var $inactive = $('<button id="inactive">Inactivate</button>');
+                            var $active = $('<button id="active" class="hidden">Activate</button>');
+
+                            if (element.data('isActive') == true) {
+                                $active.addClass('hidden');
+                                $inactive.removeClass('hidden');
+                            } else {
+                                $inactive.addClass('hidden');
+                                $active.removeClass('hidden');
+                            }
+
+                            $inactive.on('click', function () {
+                                tryLockNetworkElement(element);
+                                $inactive.addClass('hidden');
+                                $active.removeClass('hidden');
+                            });
+
+                            $active.on('click', function () {
+                                tryLockNetworkElement(element);
+                                $active.addClass('hidden');
+                                $inactive.removeClass('hidden');
+                            });
+                            $('#network-view').append($ctr);
+                            $ctr.append($menuContents).append($active).append($inactive);
+                            return $ctr;
+                        }
+                    },
+                    show: { solo: true },
+                    position: {
+                        my: 'top center',
+                        at: 'bottom center',
+                        adjust: { method: 'flip' },
+                        effect: false,
+                        viewport: $('#network-view')
+                    },
+                    style: {
+                        classes: 'qtip-bootstrap',
+                        tip: { width: 16, height: 8 }
+                    },
+                });
+            }
+
+            /*=====================================================================================================
+                                                        Helper Functions
+            ======================================================================================================*/
+
+            // Simple function to return a node from the list based off the ip
+            function getNode(ipAddress) {
+                var n = cy.nodes();
+                for (var i = 0; i < nodes.length; i++) {
+                    if (nodes[i]["ipAddress"] == ipAddress) {
+                        return n[i];
+                    }
+                }
+            }
+
+            // Calculate the round trip path from start to end
+            function getPath(startNode, endNode) {
+                var aStar = cy.elements().aStar({ root: startNode, goal: endNode, weight: function (edge) {return edge.data('activeWeight')} });
+                var pathToTruncate = Object.values(aStar.path);
+                var truncatedPath = truncatePath(pathToTruncate);
+                truncatedPath = reorderPath(truncatedPath);
+
+                // The return path is simply the reverse of the original path with the first element removed
+                // so the processing center doesn't animate twice.
+                var returnPath = truncatedPath.slice(0);
+                returnPath.reverse();
+                returnPath.shift();
+
+                var path = truncatedPath.concat(returnPath);
+
+                return path;
+            }
+
+            // For some reason the cytoscape aStar path has edges after nodes, this should properly order things
+            function reorderPath(path) {
+                for (var i = 1; i < path.length; i += 2) {
+                    var temp = path[i];
+                    path[i] = path[i + 1];
+                    path[i + 1] = temp;
+                }
+                return path;
+            }
+
+            // The aStar cytoscape function returns a strange object, this extracts the path of nodes
+            function truncatePath(aStarPath) {
+                var truncated = [];
+
+                for (var i = 0; i < aStarPath.length; i++) {
+                    if (typeof (aStarPath[i]) == "number")
+                        return truncated;
+                    else
+                        truncated.push(aStarPath[i]);
+                }
+
+                return truncated;
+            }
+
+            function unique(arr) {
+                var result = [];
+                var hash = {};
+                for (var i = 0; i < arr.length; i++) {
+                    var key = (typeof arr[i]) + arr[i];
+                    if (!hash[key]) {
+                        result.push(arr[i]);
+                        hash[key] = true;
+                    }
+                }
+                return result;
+            }
+
+            function getRemainingIp() {
+                for (var i = 1; i < 255; i++) {
+                    ipSet.push(i);
+                }
+                for (var i = 0; i < ipSet.length; i++) {
+                    remainIpSet.push(ipSet[i]);
+                }
+                for (var i = remainIpSet.length - 1; i >= 0; i--) {
+                    a = remainIpSet[i];
+                    for (var j = storeList.length - 1; j >= 0; j--) {
+                        b = storeList[j];
+                        if (a == b) {
+                            remainIpSet.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+                for (var i = remainIpSet.length - 1; i >= 0; i--) {
+                    a = remainIpSet[i];
+                    for (var j = relayList.length - 1; j >= 0; j--) {
+                        b = relayList[j];
+                        if (a == b) {
+                            remainIpSet.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+                for (var i = remainIpSet.length - 1; i >= 0; i--) {
+                    a = remainIpSet[i];
+                    for (var j = relayList.length - 1; j >= 0; j--) {
+                        b = relayList[j];
+                        if (a == b) {
+                            remainIpSet.splice(i, 1);
+                            break;
+                        }
+                    }
+                }
+                existIpSet = storeList.concat(relayList);
+                sortByLength(storeList);
+                sortByLength(relayList);
+                sortByLength(ipSet);
+                sortByLength(existIpSet);
+                sortByLength(remainIpSet);
+            }
+
+            function validateInput() {
+                let date = new Date();
+                let day = date.getDay() + 1;
+                let month = date.getMonth() + 1 ;
+                let year = date.getFullYear();
+                let transActionDate = day + "/" + month + "/" + year;
+
+                for (var i = 0; i < storeList.length; i++) {
+                    $('#transactionIPAddress').append('<option>' + storeList[i] + '</option>');
+                }
+                for (var i = 0; i < relayList.length; i++) {
+                    $('#storeIpConnectedTo').append('<option>' + relayList[i] + '</option>');
+                    $('#relayIpConnectedTo').append('<option>' + relayList[i] + '</option>');
+                }
+                for (var i = 0; i < remainIpSet.length; i++) {
+                    $('#storeIpAddress').append('<option>' + remainIpSet[i] + '</option>');
+                    $('#relayIpAddress').append('<option>' + remainIpSet[i] + '</option>');
+                    $('#gateway-ipAddress').append('<option>' + remainIpSet[i] + '</option>');
+                    $('#relay-ipAddress').append('<option>' + remainIpSet[i] + '</option>');
+                    $('#store-ipAddress').append('<option>' + remainIpSet[i] + '</option>');
+                }
+                for (var i = 0; i < existIpSet.length; i++) {
+                    $('#ipOne').append('<option>' + existIpSet[i] + '</option>');
+                    $('#ipTwo').append('<option>' + existIpSet[i] + '</option>');
+                }
+                for (var i = 1; i < 11; i++) {
+                    $('#storeWeight').append('<option>' + i + '</option>');
+                    $('#relayWeight').append('<option>' + i + '</option>');
+                    $('#connectionWeight').append('<option>' + i + '</option>');
+                    $('#store-relay').append('<option>' + i + '</option>');
+                    $('#gateway-relay').append('<option>' + i + '</option>');
+                }
+
+                $('#transactionDate').val(transActionDate);
+            }
+
+            // transfer ip with prefix and sort them by length and letters
+            function sortByLength(arr) {
+                arr.sort(function (a, b) { return a - b });
+                for (var i = 0; i < arr.length; i++) {
+                    arr[i] = "192.168.0." + arr[i];
+                }
+            }
+
+        }); // on dom ready
+    </script>
+</body>
+
+</html>
