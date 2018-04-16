@@ -8,7 +8,7 @@ using System.Web;
 using System.Configuration;
 using System.Net.Mail;
 using System.Web.UI;
-
+using System.Windows.Forms;
 
 namespace NetworkCommunicationMonitor.Models
 {
@@ -21,6 +21,7 @@ namespace NetworkCommunicationMonitor.Models
         public string target;
         public int distance;
         public int value;
+        public int weight;
 
         public Connection()
         {
@@ -36,7 +37,7 @@ namespace NetworkCommunicationMonitor.Models
             {
                 DataTable questionTable = new DataTable();
                 DataRowCollection rows;
-                string _sql = @"SELECT station_one_id, station_two_id, weight FROM Connection";
+                string _sql = @"SELECT connection_id, station_one_id, station_two_id, weight FROM Connection";
                 var cmd = new SqlCommand(_sql, cn);
 
                 cn.Open();
@@ -47,7 +48,7 @@ namespace NetworkCommunicationMonitor.Models
                 foreach (DataRow row in rows)
                 {
                     Connection tempConnection = new Connection();
-                    //tempConnection.id = Convert.ToInt32(row["connection_id"]);
+                    tempConnection.id = Convert.ToInt32(row["connection_id"]);
                     tempConnection.ipOne = Convert.ToString(row["station_one_id"]);
                     tempConnection.source = Convert.ToString(row["station_one_id"]);
                     tempConnection.ipTwo = Convert.ToString(row["station_two_id"]);
@@ -61,7 +62,8 @@ namespace NetworkCommunicationMonitor.Models
             return connections;
         }
 
-        public static void addConnection(string ipOne, string ipTwo)
+
+        public static void addConnection(int weight, string ipOne, string ipTwo)
         {
             var cn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
             var cn1 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
@@ -77,10 +79,10 @@ namespace NetworkCommunicationMonitor.Models
             string region1;
             string region2;
             int amount1, amount2;
-            bool isGateway1,isGateway2;
+            bool isGateway1, isGateway2;
 
-                if (ipOne != ipTwo)
-                {
+            if (ipOne != ipTwo)
+            {
                 using (cn1)
                 {
                     string _sql1 = @"SELECT Count(store_id) FROM Store WHERE store_id = '" + ipOne + "'";
@@ -109,37 +111,37 @@ namespace NetworkCommunicationMonitor.Models
                     }
                 }
 
-                    using (cn4)
+                using (cn4)
+                {
+                    string _sql4 = @"SELECT Count(store_id) FROM Store WHERE store_id = '" + ipTwo + "'";
+                    var cmd4 = new SqlCommand(_sql4, cn4);
+                    cn4.Open();
+                    amount2 = (int)cmd4.ExecuteScalar();
+                    if (amount2 == 1)
                     {
-                        string _sql4 = @"SELECT Count(store_id) FROM Store WHERE store_id = '" + ipTwo + "'";
-                        var cmd4 = new SqlCommand(_sql4, cn4);
-                        cn4.Open();
-                        amount2 = (int)cmd4.ExecuteScalar();
-                        if (amount2 == 1)
+                        using (cn5)
                         {
-                                using (cn5)
-                                {
-                                   string _sql5 = @"SELECT region FROM Store WHERE store_id = '" + ipTwo + "'";
-                                   var cmd5 = new SqlCommand(_sql5, cn5);
-                                   cn5.Open();
-                                   region2 = (string)cmd5.ExecuteScalar();
-                                }
+                            string _sql5 = @"SELECT region FROM Store WHERE store_id = '" + ipTwo + "'";
+                            var cmd5 = new SqlCommand(_sql5, cn5);
+                            cn5.Open();
+                            region2 = (string)cmd5.ExecuteScalar();
                         }
-   
-                        else
-                        {
-                             using (cn6)
-                             {
-                                string _sql6 = @"SELECT region FROM RelayStation WHERE station_id = '" + ipTwo + "'";
-                                var cmd6 = new SqlCommand(_sql6, cn6);
-                                cn6.Open();
-                                region2 = (string)cmd6.ExecuteScalar();
-                             }
- 
-                    }
                     }
 
-                if(amount1 != 1)
+                    else
+                    {
+                        using (cn6)
+                        {
+                            string _sql6 = @"SELECT region FROM RelayStation WHERE station_id = '" + ipTwo + "'";
+                            var cmd6 = new SqlCommand(_sql6, cn6);
+                            cn6.Open();
+                            region2 = (string)cmd6.ExecuteScalar();
+                        }
+
+                    }
+                }
+
+                if (amount1 != 1)
                 {
                     using (cn7)
                     {
@@ -154,7 +156,7 @@ namespace NetworkCommunicationMonitor.Models
                     isGateway1 = false;
                 }
 
-                if(amount2 != 1)
+                if (amount2 != 1)
                 {
                     using (cn8)
                     {
@@ -171,38 +173,40 @@ namespace NetworkCommunicationMonitor.Models
 
 
                 if (region1 == region2 || (isGateway1 == true && isGateway2 == true))
+                {
+                    if (amount1 == 1 && amount2 == 1)
                     {
-                        if (amount1 == 1 && amount2 == 1 )
-                        {
-                        Console.WriteLine("Store cannot be connected to store");
-                        }
-                        else
-                        {
+                        Console.WriteLine("Store cannot be connected to store!");
+                        MessageBox.Show("Store cannot be connected to store!");
+                    }
+                    else
+                    {
 
                         using (cn)
                         {
-                            string _sql = @"INSERT INTO Connection (station_one_id, station_two_id, connection_isActive, weight) VALUES('" + ipOne + "', '" + ipTwo + "', '" + 1 + "', '" + 1 + "')";
+                            string _sql = @"INSERT INTO Connection (station_one_id, station_two_id, connection_isActive, weight) VALUES('" + ipOne + "', '" + ipTwo + "', '" + 1 + "', '" + weight + "')";
                             var cmd = new SqlCommand(_sql, cn);
+
 
                             cn.Open();
                             cmd.ExecuteNonQuery();
                             cn.Close();
                         }
                     }
-                    }
-                    else
-                    {
-                    Console.WriteLine("It cannot be connected to relaystation or store in other region!");
-                    }
-
                 }
                 else
                 {
-                    Console.WriteLine("It cannot be connected to itself!");
+                    Console.WriteLine("It cannot be connected to relaystation or store in other region!");
+                    MessageBox.Show("It cannot be connected to relaystation or store in other region!");
                 }
+
+            }
+            else
+            {
+                Console.WriteLine("It cannot be connected to itself!");
+                MessageBox.Show("It cannot be connected to itself!");
+            }
 
         }
     }
 }
-
-

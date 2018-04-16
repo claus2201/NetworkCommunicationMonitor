@@ -578,23 +578,23 @@
                                                                         <select class="form-control" id="transactionIPAddress" name="transactionIPAddress" style="padding:0;"></select>
                                                                     </div>
                                                                 </div>
-                                                            @{
-                                                                List<NetworkCommunicationMonitor.Models.Card> cards = (List<NetworkCommunicationMonitor.Models.Card>)ViewData["Cards"];
+                                                                @{
+                                                                    List<NetworkCommunicationMonitor.Models.Card> cards = (List<NetworkCommunicationMonitor.Models.Card>)ViewData["Cards"];
                                                                 <div class="form-group">
                                                                     <label for="transactionCardNumber" class="col-sm-4 control-label">Card number</label>
                                                                     <div class="col-sm-6">
                                                                         <select class="form-control" id="transactionCardNumber" name="transactionCardNumber" style="padding:0;">
-                                                                        @{
-                                                                            foreach (NetworkCommunicationMonitor.Models.Card card in cards)
-                                                                            {
-                                                                            @*<input type="text" class="form-control" id="transactionCardNumber" name="transactionCardNumber" placeholder="Card number" maxlength="19" onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,'')" required />*@
-                                                                            <option>@card.cardNumber</option>
+                                                                            @{
+                                                                                foreach (NetworkCommunicationMonitor.Models.Card card in cards)
+                                                                                {
+                                                                                    @*<input type="text" class="form-control" id="transactionCardNumber" name="transactionCardNumber" placeholder="Card number" maxlength="19" onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,'')" required />*@
+                                                                                    <option>@card.cardNumber</option>
                                                                                 }
                                                                             }
                                                                         </select>
                                                                     </div>
                                                                 </div>
-                                                            }
+                                                                }
                                                                 <div class="form-group">
                                                                     <label for="transactionAmount" class="col-sm-4 control-label">Transaction Amount</label>
                                                                     <div class="col-sm-6">
@@ -615,6 +615,12 @@
                                                                             <option>Credit</option>
                                                                             <option>Debit</option>
                                                                         </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="transactionSelf" class="col-sm-4 control-label">Self</label>
+                                                                    <div class="col-sm-6">
+                                                                        <input type="checkbox" class="center-block" id="transactionSelf" style="min-width:20px;min-height:20px;margin:9px 10px 0px 0%;" />
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
@@ -769,12 +775,13 @@
             const edges = @Html.Raw(Json.Encode(ViewData["Links"]));
             const data = [];
             const relayColor = 'green';
+            const PROCESSINGCENTERID = 200;
             const WEIGHTOFFSET = 100000000; // This is used to inactivate relays/connections and to prevent a path from routing through a store
+            const animationLength = 1200; // Time the animations take in milliseconds
 
             var storeIds = [];
             var relayIds = [];
             var connectionIds = [];
-
             var storeList = [];
             var relayList = [];
             var gatewayList = [];
@@ -783,17 +790,12 @@
             var remainIpSet = []; // ip addresses not include stores and relays
             var currentAnimations = [];
             var currentAnimationSet = new Set();
+            var queueAnimationSet = new Set();
             var animationsArePaused = false;
 
             convertElements();
             getRemainingIp();
             validateInput();
-
-            //console.log("storeList:", storeList);
-            //console.log("relayList:", relayList);
-            //console.log("ipSet:", ipSet);
-            //console.log("existIpSet:", existIpSet);
-            //console.log("remainIpSet:", remainIpSet);
 
             var cy = cytoscape({
                 ready: function () { window.cy = this; },
@@ -836,24 +838,24 @@
                         'border-color': 'black',
                         'background-color': 'black',
                         'opacity': '1'
-                    })
-                    .selector('edge:selected')
-                    .css({
-                        //'border-color': 'black',
-                        //'background-color': 'black',
-                        //'line-color': 'black',
-                        //'target-arrow-color': 'black',
-                        //'source-arrow-color': 'black',
-                        //'width': '5px',
-                        //'height': '5px',
-                        //'opacity': '1'
-                    })
-                    .selector('node:selected')
-                    .css({
-                        //'border-color': 'black',
-                        //'background-color': 'black',
-                        //'opacity': '1'
                     }),
+                //    .selector('edge:selected')
+                //    .css({
+                //        'border-color': 'black',
+                //        'background-color': 'black',
+                //        'line-color': 'black',
+                //        'target-arrow-color': 'black',
+                //        'source-arrow-color': 'black',
+                //        'width': '5px',
+                //        'height': '5px',
+                //        'opacity': '1'
+                //    })
+                //    .selector('node:selected')
+                //    .css({
+                //        'border-color': 'black',
+                //        'background-color': 'black',
+                //        'opacity': '1'
+                //    }),
                 //.selector('.outline')
                 //.css({
                 //    "text-outline-color": '#e6e6e6',
@@ -871,7 +873,9 @@
                 popOver(this);
             });
             cy.on('click', 'edge', function (evt) {
-                tryLockNetworkElement(this);
+                if (animationsArePaused) {
+                    tryLockNetworkElement(this);
+                }
             });
 
             function tryLockNetworkElement(element) {
@@ -898,7 +902,7 @@
                         element.animation({
                             style: {
                                 'background-color': relayColor,
-                                'line-color': 'grey'
+                                'line-color': 'gray'
                             },
                             duration: 500
                         }).play();
@@ -923,6 +927,9 @@
                 transaction.transactionDate = $('#transactionDate').val();
                 transaction.amount = $('#transactionAmount').val();
                 transaction.category = $('#transactionCategory').val();
+                transaction.currentNode = null;
+                transaction.hasBeenProcessed = false;
+                transaction.self = document.getElementById("transactionSelf").checked;
 
                 //Database insertion
                 $.ajax({
@@ -948,11 +955,12 @@
                 animPath(processingCenter, startNode, true);
             }
 
-            function assembleAnim(storeNode, transaction) {
+            function assembleAnim(storeNode, transaction, finalDestination) {
                 console.log("Assembling animation")
+                console.log(storeNode)
 
                 var processingCenter = getNode("@NetworkCommunicationMonitor.Models.Relay.PROCESSINGCENTERIP");
-                var path = getPath(storeNode, processingCenter);
+                var path = getPath(storeNode, processingCenter, finalDestination, transaction);
                 var n = cy.nodes();
                 var animationList = []
                 // Assemble list of animations
@@ -971,14 +979,15 @@
                                 'width': '10px',
                                 'height': '10px'
                             },
-                            duration: 1000
+                            duration: animationLength
                         });
                         animation['paused'] = false;
                         animation['node'] = path[i];
+                        animation['transaction'] = transaction;
+                        animation['startNode'] = storeNode;
                         animationList.push(animation);
                     }
                 }
-
                 currentAnimations.push(animationList);
                 newAnim(animationList, 0);
             }
@@ -994,16 +1003,16 @@
                     let tempId = nodes[i].id.slice(10);
 
                     if (nodes[i].group == 0) {  // Processing center
-                        data.push({ group: 'nodes', data: { id: tempId, color: 'orange', shape: 'barrel', width: '50', height: '50', category: '1', queue: [], isActive: true } });
+                        data.push({ group: 'nodes', data: { id: tempId, color: 'orange', shape: 'barrel', width: '50', height: '50', category: '1', queue: [], isActive: true, limit: nodes[i].queueLimit, name: 'Processing Center' } });
                     } else if (nodes[i].group == 1) {   // Store
                         storeIds.push(tempId);
                         storeList.push(tempId);
-                        data.push({ group: 'nodes', data: { id: tempId, color: 'blueviolet', shape: 'ellipse', width: '20', height: '20', category: '3', parent: nodes[i].region, isActive: true } });
+                        data.push({ group: 'nodes', data: { id: tempId, color: 'blueviolet', shape: 'ellipse', width: '20', height: '20', category: '3', parent: nodes[i].region, queue: [], isActive: true, name: nodes[i].name } });
                     } else if (nodes[i].group == 2) {   // Relay
                         relayIds.push(tempId);
                         relayList.push(tempId);
                         if (nodes[i].isActive) { status = 'active'; } else { status = 'inactive'; }
-                        data.push({ group: 'nodes', data: { id: tempId, color: 'green', shape: 'triangle ', width: '35', height: '35', category: '2', status: status, parent: nodes[i].region, queue: [], isActive: true } });
+                        data.push({ group: 'nodes', data: { id: tempId, color: 'green', shape: 'triangle ', width: '35', height: '35', category: '2', status: status, parent: nodes[i].region, queue: [], isActive: true, limit: nodes[i].queueLimit, name: 'Relay' } });
                     }
                 }
                 arr = unique(temp);
@@ -1032,24 +1041,133 @@
 
             // Play the animation and try to continue
             function newAnim(animationList, currentAnimationPlayingIndex) {
+                console.log("newAnim");
+                //Get animation
                 var animation = animationList[currentAnimationPlayingIndex];
-                currentAnimationSet.add(animation);
-                if (!animationsArePaused) {
-                    animation.play();
+                //Add to queue
+                if (animationList.length != currentAnimationPlayingIndex) {
+                    var elementQueue = animation['node'].data('queue')
+                    elementQueue.push(animation);
+                    animation['node'].data('queue', elementQueue);
                 }
+
+                // Let the transaction know what node it's in
+                animation['transaction'].currentNode = animation['node']
+                var atProcessingCenter = (animation['node'].data('id') == PROCESSINGCENTERID)
+                if (atProcessingCenter) {
+                    var transaction = animation['transaction'];
+
+                    // The transactionToSubmit can't have a reference to its current node or the
+                    // ajax request blows up the callstack because the node also has a reference to
+                    // the transaction
+                    var transactionToSubmit = new Object();
+                    transactionToSubmit.cardNumber = transaction.cardNumber
+                    transactionToSubmit.storeIP = transaction.storeIP
+                    transactionToSubmit.transactionDate = transaction.transactionDate
+                    transactionToSubmit.amount = transaction.amount
+                    transactionToSubmit.category = transaction.category
+                    transactionToSubmit.self = transaction.self
+                    transactionToSubmit.transactionID = transaction.transactionID;
+
+                    $.ajax({
+                        method: "POST",
+                        url: "/Home/GenerateResponse",
+                        data: transactionToSubmit,
+                        success: (result) => {
+                            console.log("Successful processing", result)
+                            animation['transaction'].hasBeenProcessed = true;
+                        },
+                        error: (result) => {
+                            console.log("Error on ajax request", result);
+                        }
+                    });
+                    console.log("ajax")
+                }
+
+                //Check to see if the animation should play
+                var firstInQueue = (elementQueue[0] == animation);
+                var nodeIsAlreadyAnimating = animation['node'].animated()
+                if (nodeIsAlreadyAnimating) {
+
+                }
+                if (!animationsArePaused && firstInQueue && !nodeIsAlreadyAnimating) {
+                    animation.play();
+                    currentAnimationSet.add(animation);
+                } else {
+                    queueAnimationSet.add(animation);
+                }
+                
+                //Setup what happens next
                 animation.promise('completed').then(function () {
                     animation
                         .reverse()
                         .rewind()
                         .play();
+                    //Kick off the next animation in the queue
+                    setTimeout(function () { playNecessaryQueuedAnimations(); }, animationLength*2);
 
                     currentAnimationSet.delete(animation);
-                    console.log("Animating a node");
                     if (currentAnimationPlayingIndex < animationList.length - 1) {
+                        elementQueue.shift();
+                        animation['node'].data('queue', elementQueue);
+
                         currentAnimationPlayingIndex += 1;
                         newAnim(animationList, currentAnimationPlayingIndex);
+                    } else {
+                        elementQueue.shift();
+                        animation['node'].data('queue', elementQueue);
                     }
                 });
+            }
+
+            function playAnimations() {
+                //currentAnimationSet.forEach(function (animation) { animation.play() })
+                //playNecessaryQueuedAnimations();
+                reassemblePaths();
+            }
+
+            function playNecessaryQueuedAnimations() {
+                queueAnimationSet.forEach(function (animation) {
+                    if (animationIsFirstInQueue(animation)) {
+                        currentAnimationSet.add(animation);
+                        animation.play();
+                    }
+                });
+            }
+
+            function reassemblePaths() {
+                console.log("Reassembling animation paths")
+                //currentAnimationSet.forEach(function (animation) {
+                //    animation.reverse().play().promise('completed').then(function () {
+                //        animation
+                //            .stop();
+                //    });
+                //});
+
+                // Get all transactions and empty the queues of all nodes
+                var existingTransactions = [];
+                data.forEach(function (element) {
+                    var oldQueue = element['data']['queue']
+                    if (oldQueue != undefined && oldQueue.length > 0) {
+                        for (var i = 0; i < oldQueue.length; i++) {
+                            existingTransactions.push(oldQueue[i]['transaction'])
+                        }
+                        element['data']['queue'] = []
+                    }
+                });
+
+                // Assemble all the new animations
+                for (var i = 0; i < existingTransactions.length; i++) {
+                    var transaction = existingTransactions[i];
+                    var originalStart = getNodeById(transaction.storeIP);
+                    var currentlyAt = transaction.currentNode;
+                    if (currentlyAt.data('source') != undefined) {
+                        currentlyAt = getNodeById(currentlyAt.data('source'))
+                    }
+                    assembleAnim(currentlyAt, transaction, originalStart);
+                }
+
+                playNecessaryQueuedAnimations()
             }
 
             /*=====================================================================================================
@@ -1071,12 +1189,23 @@
             function pauseOrPlayAnimations(node) {
                 if (animationsArePaused) {
                     animationsArePaused = false;
-                    currentAnimationSet.forEach(function (animation) { animation.play() })
+                    playAnimations();
                     $("#play").addClass('hidden');
                     $("#pause").removeClass('hidden');
                 } else {
                     animationsArePaused = true;
-                    currentAnimationSet.forEach(function (animation) { animation.pause() })
+                    currentAnimationSet.forEach(function (animation) {
+                        //animation
+                        //    .pause()
+                        //    .reverse()
+                        //    .play()
+                        //    .promise('completed').then(function () {
+                        //        animation
+                        //            .stop();
+                        //    });
+                        animation.progress(0.0).apply().pause();
+                    })
+                    //queueAnimationSet.forEach(function (animation) { animation.pause() })
                     $("#pause").addClass('hidden');
                     $("#play").removeClass('hidden');
                 }
@@ -1086,17 +1215,72 @@
                 $('#close-transaction').click();
                 var transactionStart = $('#transactionIPAddress').val();
                 var startNode = getNode(transactionStart);
-                assembleAnim(startNode, transaction);
+                assembleAnim(startNode, transaction, startNode);
             }
 
             function popOver(element) {
-                cy.elements("node[category= '2']").qtip({
+                cy.elements("node[category= '1']").qtip(qtipContent(element, true));
+                cy.elements("node[category= '2']").qtip(qtipContent(element, false));
+                cy.elements("node[category= '3']").qtip(qtipContent(element, false));
+            }
+
+            function qtipContent(element, isProcessingCenter) {
+                var content = {
                     content: {
                         text: function () {
-                            var $menuContents = $('<div> Queue:' + element.data('queue').toString() + '</div>');
+                            var elementQueue = element.data('queue');
+                            var limit = element.data('limit');
+                            var queueString = [];
+                            var transactionInfo = "None";
+                            if (elementQueue.length >= 1) {
+                                transactionInfo = "Encrypted";
+                            }
+                            if (isProcessingCenter && elementQueue.length >= 1) {
+                                transactionInfo = "<br>Card Number: " + elementQueue[0]['transaction']['cardNumber']
+                                    + "<br> Store IP: " + elementQueue[0]['transaction']['storeIP']
+                                    + "<br> Amount: " + elementQueue[0]['transaction']['amount']
+                                    + "<br> Category: " + elementQueue[0]['transaction']['category'];
+                            }
+                            for (var i = 0; i < elementQueue.length; i++) {
+                                queueString.push(elementQueue[i]['transaction']['transactionID']);
+                            }
+
+                            let differ = limit - queueString.length;
+                            if (differ != null && differ < 0) {
+                                queueString = queueString.slice(0, differ);
+                            }
+                            if (queueString.length == 0) {
+                                queueString = 'Empty';
+                            } else {
+                                queueString = queueString.join();
+                            }
+                            if (limit == undefined) {
+                                limit = "Unlimited";
+                            }
+                            var $newLimitButton = $('<br><div><button id="newLimitButton" class="btn btn-sm btn-primary center-block">Update Limit</button></div>');
+                            var $newLimitInput = $('<input id="newLimitInput" class="hidden center-block" placeholder="New Limit"></input>');
+
+                            var menuString = '<div class="well well-sm"><div class="alert alert-success" role="alert">'
+                                + '<p> Name: ' + element.data('name') + '</p> '
+                                + '<p> Limit: ' + limit + '</p>'
+                                + '<p> Queue: ' + queueString + '</p>'
+                                + '</div > <div class="alert alert-success" role="alert">Transaction Information: <hr>' + transactionInfo + '</div>'
+                            
+                            var $menuContents = $(menuString);
                             var $ctr = $('<div class="select-buttons"></div>');
-                            var $inactive = $('<button id="inactive">Inactivate</button>');
-                            var $active = $('<button id="active" class="hidden">Activate</button>');
+                            var $inactive = $('<button id="inactive" class="btn btn-sm btn-primary center-block">Inactivate</button>');
+                            var $active = $('<button id="active" class="hidden btn btn-sm btn-primary center-block">Activate</button>');
+                            if (isProcessingCenter || !animationsArePaused) {
+                                $inactive = $('');
+                                $active = $('');
+                                console.log("Should be inactive")
+                                $newLimitButton = $('');
+                                $newLimitInput = $('');
+                            } else {
+                                console.log("Should be active")
+                                $newLimitButton.removeClass('hidden');
+                                $newLimitInput.removeClass('hidden');
+                            }
 
                             if (element.data('isActive') == true) {
                                 $active.addClass('hidden');
@@ -1105,6 +1289,28 @@
                                 $inactive.addClass('hidden');
                                 $active.removeClass('hidden');
                             }
+
+                            $newLimitButton.on('click', function () {
+                                console.log($newLimitInput.val());
+                                var node = new Object();
+                                node.ipAddress = '192.168.0.' + element.data('id');
+                                node.queueLimit = $newLimitInput.val();
+
+                                $.ajax({
+                                    method: "POST",
+                                    url: "/Home/ChangeQueueLimit",
+                                    data: node,
+                                    success: (result) => {
+                                        console.log("Successful ajax request: ")
+                                        console.log("Node " + node.ipAddress + " has new queue limit: " + result);
+                                        element.data('limit', node.queueLimit);
+                                    },
+                                    error: (result) => {
+                                        console.log("Error on ajax request");
+                                        console.log(result);
+                                    }
+                                });
+                            })
 
                             $inactive.on('click', function () {
                                 tryLockNetworkElement(element);
@@ -1118,28 +1324,36 @@
                                 $inactive.removeClass('hidden');
                             });
                             $('#network-view').append($ctr);
-                            $ctr.append($menuContents).append($active).append($inactive);
+                            $ctr.append($menuContents).append($active).append($inactive).append($newLimitButton).append($newLimitInput);
                             return $ctr;
                         }
                     },
-                    show: { solo: true },
+                    prerender: false,
+                    overwrite: true,
                     position: {
                         my: 'top center',
                         at: 'bottom center',
-                        adjust: { method: 'flip' },
-                        effect: false,
-                        viewport: $('#network-view')
+                        container: $('#network-view'),
                     },
                     style: {
                         classes: 'qtip-bootstrap',
-                        tip: { width: 16, height: 8 }
+                        tip: { width: 16, height: 8 },
                     },
-                });
+                    show: {
+                        solo: true,
+                    },
+                }
+                return content;
             }
 
             /*=====================================================================================================
                                                         Helper Functions
             ======================================================================================================*/
+
+            function animationIsFirstInQueue(animation) {
+                var elementQueue = animation['node'].data('queue')
+                return (elementQueue[0] == animation);
+            }
 
             // Simple function to return a node from the list based off the ip
             function getNode(ipAddress) {
@@ -1151,22 +1365,89 @@
                 }
             }
 
-            // Calculate the round trip path from start to end
-            function getPath(startNode, endNode) {
-                var aStar = cy.elements().aStar({ root: startNode, goal: endNode, weight: function (edge) {return edge.data('activeWeight')} });
+            function getNodeById(Id) {
+                var n = cy.nodes();
+                for (var i = 0; i < n.length; i++) {
+                    if (n[i].data('id') == Id) {
+                        return n[i];
+                    }
+                }
+
+                for (var i = 0; i < nodes.length; i++) {
+                    if (nodes[i]["ipAddress"] == Id) {
+                        return n[i];
+                    }
+                }
+
+                var e = cy.edges();
+                for (var i = 0; i < e.length; i++) {
+                    if (e[i].data('id') == Id) {
+                        return e[i];
+                    }
+                }
+                console.log("Node not found by Id")
+            }
+
+            // Calculate the round trip path from start to end.
+            // if the finalDestination is not the same as endNode,
+            // that means the path is being reassembled. The path should then concatenate
+            // a one way path back to the final destination
+            function getPath(startNode, endNode, finalDestination, transaction) {
+                console.log("getting path")
+                console.log(startNode)
+                console.log(endNode)
+                console.log(finalDestination)
+
+                var localDestination;
+                var needsOneWayAddition = false;
+                if (transaction.hasBeenProcessed) {
+                    localDestination = finalDestination;
+                } else {
+                    localDestination = endNode;
+                    needsOneWayAddition = true;
+                }
+                //console.log("localDestination: ")
+                //console.log(localDestination);
+
+                var aStar = cy.elements().aStar({ root: startNode, goal: localDestination, weight: function (edge) { return edge.data('activeWeight') } });
                 var pathToTruncate = Object.values(aStar.path);
                 var truncatedPath = truncatePath(pathToTruncate);
                 truncatedPath = reorderPath(truncatedPath);
-
+                //console.log("reorderedPath")
+                //console.log(truncatedPath);
+                
                 // The return path is simply the reverse of the original path with the first element removed
                 // so the processing center doesn't animate twice.
-                var returnPath = truncatedPath.slice(0);
-                returnPath.reverse();
-                returnPath.shift();
+                //var returnPath = truncatedPath.slice(0);
+                //returnPath.reverse();
+                //returnPath.shift();
+                //console.log("returnPath")
+                //console.log(returnPath);
 
-                var path = truncatedPath.concat(returnPath);
+                //var path = truncatedPath.concat(returnPath);
+                var path = truncatedPath;
+                //console.log("needsOneWayPath:" + needsOneWayAddition)
+                if (needsOneWayAddition) {
+                    var temp = getOneWayPath(endNode, finalDestination);
+                    //console.log("temp: ")
+                    //console.log(temp);
+                    path = path.concat(temp);
+                }
 
+                console.log("returning full path:");
+                console.log(path);
                 return path;
+            }
+
+            function getOneWayPath(startNode, endNode) {
+                console.log("One way path")
+                console.log(startNode)
+                console.log(endNode)
+                var aStar = cy.elements().aStar({ root: startNode, goal: endNode, weight: function (edge) { return edge.data('activeWeight') } });
+                var pathToTruncate = Object.values(aStar.path);
+                var truncatedPath = truncatePath(pathToTruncate);
+                truncatedPath = reorderPath(truncatedPath);
+                return truncatedPath;
             }
 
             // For some reason the cytoscape aStar path has edges after nodes, this should properly order things
@@ -1253,7 +1534,7 @@
 
             function validateInput() {
                 let date = new Date();
-                let day = date.getDay() + 1;
+                let day = date.getDate();
                 let month = date.getMonth() + 1 ;
                 let year = date.getFullYear();
                 let transActionDate = day + "/" + month + "/" + year;
@@ -1276,7 +1557,7 @@
                     $('#ipOne').append('<option>' + existIpSet[i] + '</option>');
                     $('#ipTwo').append('<option>' + existIpSet[i] + '</option>');
                 }
-                for (var i = 1; i < 11; i++) {
+                for (var i = 1; i < 101; i++) {
                     $('#storeWeight').append('<option>' + i + '</option>');
                     $('#relayWeight').append('<option>' + i + '</option>');
                     $('#connectionWeight').append('<option>' + i + '</option>');

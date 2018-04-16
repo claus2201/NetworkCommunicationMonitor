@@ -8,6 +8,7 @@ using System.Web;
 using System.Configuration;
 using System.Net.Mail;
 using System.Web.UI;
+using System.Windows.Forms;
 
 namespace NetworkCommunicationMonitor.Models
 {
@@ -131,10 +132,10 @@ namespace NetworkCommunicationMonitor.Models
             var cn1 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
             var cn2 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
             string accountID;
-            
+
             using (cn2)
             {
-                string _sql2 = @"SELECT DISTINCT account_id FROM Card WHERE card_id = '" + cardID+ "'";
+                string _sql2 = @"SELECT DISTINCT account_id FROM Card WHERE card_id = '" + cardID + "'";
                 var cmd2 = new SqlCommand(_sql2, cn2);
                 cn2.Open();
                 SqlDataReader sdr = cmd2.ExecuteReader();
@@ -163,6 +164,7 @@ namespace NetworkCommunicationMonitor.Models
                 }
                 else
                 {
+                    MessageBox.Show("The last card of an account cannot be deleted!");
                     Console.WriteLine("The last card cannot be deleted!");
                 }
             }
@@ -186,35 +188,18 @@ namespace NetworkCommunicationMonitor.Models
         public static void createCard(string cardID, string firstname, string lastname, int card_expirationMonth, int card_expirationYear, int accountID, string cvc)
         {
             var cn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
-            var cn1 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
-            using (cn1)
+            using (cn)
             {
-                string _sql1 = @"SELECT COUNT(card_id) FROM Card WHERE card_id = '" + cardID + "'";
-                var cmd1 = new SqlCommand(_sql1, cn1);
-                cn1.Open();
-                int amount = (int)cmd1.ExecuteScalar();
+                string _sql = @"INSERT INTO Card (card_id, card_firstname, card_lastname, card_expirationMonth, "
+                + "card_expirationYear, card_securityCode, account_id) VALUES('" + cardID + "', '" + firstname + "', '" + lastname + "', " 
+                + card_expirationMonth + ", " + card_expirationYear + ", " + cvc + ", " + accountID + ")";
+                var cmd = new SqlCommand(_sql, cn);
 
-                if (amount != 1)
-                {
-                    using (cn)
-                    {
-                        string _sql = @"INSERT INTO Card (card_id, card_firstname, card_lastname, card_expirationMonth, "
-                        + "card_expirationYear, card_securityCode, account_id) VALUES('" + cardID + "', '" + firstname + "', '" + lastname + "', "
-                        + card_expirationMonth + ", " + card_expirationYear + ", " + cvc + ", " + accountID + ")";
-                        var cmd = new SqlCommand(_sql, cn);
+                cn.Open();
+                cmd.ExecuteNonQuery();
+                cn.Close();
 
-                        cn.Open();
-                        cmd.ExecuteNonQuery();
-                        cn.Close();
-
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("This card has existed!");
-                }
             }
-
         }
 
         public static void editCard(string firstname, string lastname, string cardID)

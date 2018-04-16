@@ -8,6 +8,7 @@ using System.Web;
 using System.Configuration;
 using System.Net.Mail;
 using System.Web.UI;
+using System.Windows.Forms;
 
 namespace NetworkCommunicationMonitor.Models
 {
@@ -21,6 +22,7 @@ namespace NetworkCommunicationMonitor.Models
         public int accountLimit;
         public double accountBalance;
         public List<Card> cards;
+
 
         public Account()
         {
@@ -146,6 +148,7 @@ namespace NetworkCommunicationMonitor.Models
                 else
                 {
                     Console.WriteLine("This account cannot be deleted wiht non-zero balance!");
+                    MessageBox.Show("This account cannot be deleted wiht non-zero balance!");
                 }
             }
 
@@ -200,7 +203,7 @@ namespace NetworkCommunicationMonitor.Models
                 questionTable.Load(cmd.ExecuteReader());
                 rows = questionTable.Rows;
 
-                accountNumber = Convert.ToInt32(rows[0]["account_id"]);
+                account.accountNumber = accountNumber;
                 account.accountLimit = Convert.ToInt32(rows[0]["account_limit"]);
                 account.accountBalance = Convert.ToDouble(rows[0]["account_balance"]);
             }
@@ -208,7 +211,7 @@ namespace NetworkCommunicationMonitor.Models
             return account;
         }
 
-        public static void chargeAccount(double amount, double balance, int accountNumber)
+        public static void chargeAccount(Transaction transaction, double balance, int accountNumber)
         {
             var cn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
             using (cn)
@@ -217,8 +220,15 @@ namespace NetworkCommunicationMonitor.Models
                 string _sql = @"UPDATE Account SET account_balance = @AccountBalance WHERE account_id = @AccountNumber";
                 var cmd = new SqlCommand(_sql, cn);
 
-                cmd.Parameters.Add("@AccountBalance", SqlDbType.Float).Value = amount + balance;
-                cmd.Parameters.Add("@AccountBalance", SqlDbType.Int).Value = accountNumber;
+                if (transaction.category.Equals("Credit"))
+                {
+                    cmd.Parameters.Add("@AccountBalance", SqlDbType.Float).Value = balance + transaction.amount;
+                } else
+                {
+                    cmd.Parameters.Add("@AccountBalance", SqlDbType.Float).Value = balance - transaction.amount;
+                }
+                
+                cmd.Parameters.Add("@AccountNumber", SqlDbType.Int).Value = accountNumber;
 
                 cn.Open();
                 cmd.ExecuteNonQuery();
