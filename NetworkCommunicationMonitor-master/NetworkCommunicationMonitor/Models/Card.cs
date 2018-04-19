@@ -161,6 +161,7 @@ namespace NetworkCommunicationMonitor.Models
                         cmd.ExecuteNonQuery();
                         cn.Close();
                     }
+                    MessageBox.Show("'"+cardID+"' deleted successfully! ");
                 }
                 else
                 {

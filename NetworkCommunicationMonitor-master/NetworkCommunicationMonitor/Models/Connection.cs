@@ -75,14 +75,39 @@ namespace NetworkCommunicationMonitor.Models
             var cn7 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
             var cn8 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
 
+            var cn9 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
+            var cn10 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
 
             string region1;
             string region2;
             int amount1, amount2;
             bool isGateway1, isGateway2;
+            int amount3, amount4;
 
             if (ipOne != ipTwo)
             {
+                using (cn9)
+                {
+                    string _sql9 = @"SELECT Count(station_one_id) From Connection WHERE station_one_id = '"+ipOne+"' AND station_two_id = '"+ipTwo+"'";
+                    var cmd9 = new SqlCommand(_sql9, cn9);
+                    cn9.Open();
+                    amount3 = (int)cmd9.ExecuteScalar();
+                }
+                using (cn10)
+                {
+                    string _sql10 = @"SELECT Count(station_one_id) From Connection WHERE station_one_id = '" + ipTwo + "' AND station_two_id = '" + ipOne + "'";
+                    var cmd10 = new SqlCommand(_sql10, cn10);
+                    cn10.Open();
+                    amount4 = (int)cmd10.ExecuteScalar();
+                }
+
+                if(amount3 == 1 || amount4 == 1)
+                {
+                    MessageBox.Show("This connection has existed!");
+                }
+                else
+                {
+
                 using (cn1)
                 {
                     string _sql1 = @"SELECT Count(store_id) FROM Store WHERE store_id = '" + ipOne + "'";
@@ -191,7 +216,9 @@ namespace NetworkCommunicationMonitor.Models
                             cn.Open();
                             cmd.ExecuteNonQuery();
                             cn.Close();
+
                         }
+                        MessageBox.Show("Connection added successfully! ");
                     }
                 }
                 else
@@ -200,6 +227,7 @@ namespace NetworkCommunicationMonitor.Models
                     MessageBox.Show("It cannot be connected to relaystation or store in other region!");
                 }
 
+                }
             }
             else
             {

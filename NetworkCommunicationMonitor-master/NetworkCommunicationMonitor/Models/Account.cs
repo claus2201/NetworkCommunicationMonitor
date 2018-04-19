@@ -144,6 +144,7 @@ namespace NetworkCommunicationMonitor.Models
                         cmd.ExecuteNonQuery();
                         cn.Close();
                     }
+                    MessageBox.Show(" Account '" + accountID + "' deleted successfully! ");
                 }
                 else
                 {
