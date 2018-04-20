@@ -103,7 +103,7 @@ namespace NetworkCommunicationMonitor.Models
 
                 if(amount3 == 1 || amount4 == 1)
                 {
-                    MessageBox.Show("This connection has existed!");
+                    MessageBox.Show("This connection already existed!");
                 }
                 else
                 {

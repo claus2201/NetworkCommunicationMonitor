@@ -236,5 +236,21 @@ namespace NetworkCommunicationMonitor.Models
                 cn.Close();
             }
         }
+
+        public static string formatPhoneNumber(string phoneNumber)
+        {
+            string formattedNumber = "(";
+
+            for (int i = 0; i < phoneNumber.Length; i++)
+            {
+                formattedNumber = formattedNumber + phoneNumber[i];
+                if (i == 2)
+                    formattedNumber = formattedNumber + ") ";
+                else if (i == 5)
+                    formattedNumber = formattedNumber + "-";
+            }
+
+            return formattedNumber;
+        }
     }
 }
