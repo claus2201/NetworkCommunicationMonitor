@@ -1514,7 +1514,7 @@
                 let day = date.getDate();
                 let month = date.getMonth() + 1 ;
                 let year = date.getFullYear();
-                let transActionDate = day + "/" + month + "/" + year;
+                let transActionDate = month + "/" + day + "/" + year;
 
                 for (var i = 0; i < storeList.length; i++) {
                     $('#transactionIPAddress').append('<option>' + storeList[i] + '</option>');

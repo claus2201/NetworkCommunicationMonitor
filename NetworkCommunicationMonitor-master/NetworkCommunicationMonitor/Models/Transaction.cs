@@ -98,7 +98,7 @@ namespace NetworkCommunicationMonitor.Models
             return numTransactions;
         }
 
-        public static void addTransaction(string cardNumber, string storeIP, DateTime transactionDate, double transactionAmount, string transactionCategory, bool transactionSelf)
+        public static Boolean addTransaction(string cardNumber, string storeIP, DateTime transactionDate, double transactionAmount, string transactionCategory, bool transactionSelf)
         {
             var cn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
             var cn1 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
@@ -157,11 +157,12 @@ namespace NetworkCommunicationMonitor.Models
                     cmd.ExecuteNonQuery();
                     cn.Close();
                     MessageBox.Show("Transaction added successfully!");
+                    return true;
                 }
             }
             else if (transactionYear == year1)
             {
-                if(transactionMonth < month1)
+                if (transactionMonth < month1)
                 {
                     using (cn)
                     {
@@ -193,17 +194,20 @@ namespace NetworkCommunicationMonitor.Models
                         cmd.ExecuteNonQuery();
                         cn.Close();
                         MessageBox.Show("Transaction added successfully!");
+                        return true;
                     }
 
                 }
                 else
                 {
                     MessageBox.Show("Card expired!");
+                    return false;
                 }
             }
             else
             {
                 MessageBox.Show("Card expired!");
+                return false;
             }
 
         }
@@ -240,8 +244,14 @@ namespace NetworkCommunicationMonitor.Models
 
                 questionTable.Load(cmd.ExecuteReader());
                 rows = questionTable.Rows;
+                try
+                {
+                    transactionID = Convert.ToInt32(rows[rows.Count - 1]["trans_id"]);
+                }
+                catch
+                {
 
-                transactionID = Convert.ToInt32(rows[rows.Count-1]["trans_id"]);
+                }
             }
 
             return transactionID;
