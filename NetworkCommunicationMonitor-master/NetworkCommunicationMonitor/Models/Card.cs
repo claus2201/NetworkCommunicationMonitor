@@ -126,8 +126,10 @@ namespace NetworkCommunicationMonitor.Models
             return numCards;
         }
 
-        public static void deleteCard(string cardID)
+        public static string deleteCard(string cardID)
         {
+            string result = "Card successfully deleted";
+
             var cn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
             var cn1 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
             var cn2 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
@@ -161,15 +163,14 @@ namespace NetworkCommunicationMonitor.Models
                         cmd.ExecuteNonQuery();
                         cn.Close();
                     }
-                    MessageBox.Show("'"+cardID+"' deleted successfully! ");
                 }
                 else
                 {
-                    MessageBox.Show("The last card of an account cannot be deleted!");
+                    result = "The last card of an account cannot be deleted!";
                     Console.WriteLine("The last card cannot be deleted!");
                 }
             }
-
+            return result;
         }
 
         public static void deleteCardsForAccount(int accountID)
@@ -186,21 +187,40 @@ namespace NetworkCommunicationMonitor.Models
             }
         }
 
-        public static void createCard(string cardID, string firstname, string lastname, int card_expirationMonth, int card_expirationYear, int accountID, string cvc)
+        public static string createCard(string cardID, string firstname, string lastname, int card_expirationMonth, int card_expirationYear, int accountID, string cvc)
         {
+            string result = "";
             var cn = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
-            using (cn)
+            var cn1 = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
+            int amount;
+            using (cn1)
             {
-                string _sql = @"INSERT INTO Card (card_id, card_firstname, card_lastname, card_expirationMonth, "
-                + "card_expirationYear, card_securityCode, account_id) VALUES('" + cardID + "', '" + firstname + "', '" + lastname + "', " 
-                + card_expirationMonth + ", " + card_expirationYear + ", " + cvc + ", " + accountID + ")";
-                var cmd = new SqlCommand(_sql, cn);
-
+                string _sql1 = @"SELECT COUNT(card_id) FROM Card WHERE card_id = " + cardID;
+                var cmd1 = new SqlCommand(_sql1, cn);
+                amount = (int)cmd1.ExecuteScalar();
                 cn.Open();
-                cmd.ExecuteNonQuery();
-                cn.Close();
-
             }
+
+            if(amount == 1)
+            {
+                result = "This card already exists!";
+            }
+            else
+            {
+                using (cn)
+                {
+                    string _sql = @"INSERT INTO Card (card_id, card_firstname, card_lastname, card_expirationMonth, "
+                    + "card_expirationYear, card_securityCode, account_id) VALUES('" + cardID + "', '" + firstname + "', '" + lastname + "', "
+                    + card_expirationMonth + ", " + card_expirationYear + ", " + cvc + ", " + accountID + ")";
+                    var cmd = new SqlCommand(_sql, cn);
+
+                    cn.Open();
+                    cmd.ExecuteNonQuery();
+                    cn.Close();
+                }
+                result = "Card added successfully";
+            }
+            return result;
         }
 
         public static void editCard(string firstname, string lastname, string cardID)

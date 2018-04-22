@@ -490,8 +490,8 @@
                 }
                 <!--add store end-->
                 <!--add connection start-->
-                @using (Html.BeginForm("AddConnection", "Home", FormMethod.Post))
-                {
+                @*@using (Html.BeginForm("AddConnection", "Home", FormMethod.Post))
+                {*@
                     <div class="modal fade" id="add-connection" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -532,7 +532,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <input type="submit" class="btn btn-success btn-block" value="Add To Network" />
+                                                                    <input type="submit" id="connectionsubmit" onclick="submitConnection()" class="btn btn-success btn-block" value="Add To Network" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -546,7 +546,7 @@
                             </div>
                         </div>
                     </div>
-                }
+                @*}*@
                 <!--add connection end-->
                 <!-- add transaction start-->
                 @*@using (Html.BeginForm("AddTransaction", "Home", FormMethod.Post))
@@ -769,12 +769,44 @@
     <script src="~/js/cytoscape-cose-bilkent.js"></script>
     <!-- Cytoscape-->
     <script>
-        $(function () { // on dom ready
 
+        //Currently, the page needs to be refreshed to show the results of the DB insertion
+        function submitConnection() {
+            var ipOne = $("#ipOne").val()
+            var ipTwo = $("#ipTwo").val()
+            var weight = parseInt($("#connectionWeight").val())
+
+            var connection = new Object();
+            connection.ipOne = ipOne;
+            connection.ipTwo = ipTwo;
+            connection.connectionWeight = weight;
+
+            console.log(connection);
+
+            //Database insertion
+            $.ajax({
+                method: "POST",
+                url: "/Home/AddConnection",
+                data: connection,
+                success: (result) => {
+                    console.log("Successful ajax request")
+                    alert(result);
+                },
+                error: (result) => {
+                    console.log("Error on ajax request");
+                    console.log(result);
+                }
+            });
+        }
+
+
+        $(function () { // on dom ready
             const nodes = @Html.Raw(Json.Encode(ViewData["Nodes"]));
             const edges = @Html.Raw(Json.Encode(ViewData["Links"]));
             const data = [];
             const relayColor = 'green';
+            const animationColor = 'red';
+            const connectionColor = 'gray';
             const PROCESSINGCENTERID = 200;
             const WEIGHTOFFSET = 100000000; // This is used to inactivate relays/connections and to prevent a path from routing through a store
             const animationLength = 1200; // Time the animations take in milliseconds
@@ -915,6 +947,28 @@
                     }
             }
 
+            //This will make highlight all elements with a transaction in it when paused
+            function handlePauseStateDisplay(element) {
+                if (animationsArePaused) {
+                    element.animation({
+                        style: {
+                            'background-color': animationColor,
+                            'line-color': animationColor
+                        },
+                        duration: 500
+                    }).play();
+                } else {
+                    console.log("playing back")
+                    element.animation({
+                        style: {
+                            'background-color': relayColor,
+                            'line-color': connectionColor
+                        },
+                        duration: 500
+                    }).play();
+                }
+            }
+
             /*=====================================================================================================
                                                         Core Functions
             ======================================================================================================*/
@@ -937,11 +991,13 @@
                     url: "/Home/AddTransaction",
                     data: transaction,
                     success: (result) => {
-                        closeClick(transaction);
-                        console.log("Successful ajax request: ")
-                        transaction.transactionID = result;
-                        console.log("Transaction ID: " + result);
-                        return transaction;
+                        if (result > 0) {
+                            closeClick(transaction);
+                            console.log("Successful ajax request: ")
+                            transaction.transactionID = result;
+                            console.log("Transaction ID: " + result);
+                            return transaction;
+                        }
                     },
                     error: (result) => {
                         console.log("Error on ajax request");
@@ -1084,62 +1140,64 @@
                 //Check to see if the animation should play
                 var firstInQueue = (elementQueue[0] == animation);
                 var nodeIsAlreadyAnimating = animation['node'].animated()
-                if (nodeIsAlreadyAnimating) {
-
-                }
                 if (!animationsArePaused && firstInQueue && !nodeIsAlreadyAnimating) {
-                    animation.play();
+                    //animation.play();
+                    //ATTEMPT
+                    playAnimationWhenReady(animation)
                     currentAnimationSet.add(animation);
                 } else {
                     queueAnimationSet.add(animation);
                 }
-                
+
                 //Setup what happens next
                 animation.promise('completed').then(function () {
                     animation
                         .reverse()
                         .rewind()
                         .play();
-                    //Kick off the next animation in the queue
-                    setTimeout(function () { playNecessaryQueuedAnimations(); }, animationLength*2);
+                    console.log("playing reverse animation on node: " + animation['node'].data('id'))
 
-                    currentAnimationSet.delete(animation);
-                    if (currentAnimationPlayingIndex < animationList.length - 1) {
-                        elementQueue.shift();
-                        animation['node'].data('queue', elementQueue);
+                    animation.promise('completed').then(function () {
+                        //Kick off the next animation in the queue
+                        setTimeout(function () {
+                            if (!animationsArePaused) {
+                                playNecessaryQueuedAnimations();
+                            }
+                        }, animationLength);
 
-                        currentAnimationPlayingIndex += 1;
-                        newAnim(animationList, currentAnimationPlayingIndex);
-                    } else {
-                        elementQueue.shift();
-                        animation['node'].data('queue', elementQueue);
-                    }
+                        currentAnimationSet.delete(animation);
+                        if (currentAnimationPlayingIndex < animationList.length - 1) {
+                            elementQueue.shift();
+                            animation['node'].data('queue', elementQueue);
+
+                            currentAnimationPlayingIndex += 1;
+                            newAnim(animationList, currentAnimationPlayingIndex);
+                        } else {
+                            elementQueue.shift();
+                            animation['node'].data('queue', elementQueue);
+                        }
+                    })
+
                 });
             }
 
             function playAnimations() {
-                //currentAnimationSet.forEach(function (animation) { animation.play() })
-                //playNecessaryQueuedAnimations();
                 reassemblePaths();
             }
 
             function playNecessaryQueuedAnimations() {
+
                 queueAnimationSet.forEach(function (animation) {
                     if (animationIsFirstInQueue(animation)) {
                         currentAnimationSet.add(animation);
-                        animation.play();
+                        playAnimationWhenReady(animation);
+                        queueAnimationSet.delete(animation);
                     }
                 });
             }
 
             function reassemblePaths() {
                 console.log("Reassembling animation paths")
-                //currentAnimationSet.forEach(function (animation) {
-                //    animation.reverse().play().promise('completed').then(function () {
-                //        animation
-                //            .stop();
-                //    });
-                //});
 
                 // Get all transactions and empty the queues of all nodes
                 var existingTransactions = [];
@@ -1153,6 +1211,9 @@
                     }
                 });
 
+                currentAnimationSet = new Set();
+                queueAnimationSet = new Set();
+
                 // Assemble all the new animations
                 for (var i = 0; i < existingTransactions.length; i++) {
                     var transaction = existingTransactions[i];
@@ -1165,6 +1226,21 @@
                 }
 
                 playNecessaryQueuedAnimations()
+            }
+
+            function playAnimationWhenReady(animation) {
+                var nodeIsAlreadyAnimating = animation['node'].animated();
+                var nodeAnimation = animation['node'].animation('current')
+
+                console.log("playing animation on node: " + animation['node'].data('id'))
+
+                if (nodeAnimation.playing()) {
+                    setTimeout(function () {
+                        playAnimationWhenReady(animation)
+                    }, animationLength*2);
+                } else {
+                    animation.play();
+                }
             }
 
             /*=====================================================================================================
@@ -1186,23 +1262,18 @@
             function pauseOrPlayAnimations(node) {
                 if (animationsArePaused) {
                     animationsArePaused = false;
-                    playAnimations();
+                    //currentAnimationSet.forEach(function (animation) {
+                    //    handlePauseStateDisplay(animation['node'])
+                    //})
+                    //setTimeout(function () { playAnimations();}, 1000)
                     $("#play").addClass('hidden');
                     $("#pause").removeClass('hidden');
                 } else {
                     animationsArePaused = true;
                     currentAnimationSet.forEach(function (animation) {
-                        //animation
-                        //    .pause()
-                        //    .reverse()
-                        //    .play()
-                        //    .promise('completed').then(function () {
-                        //        animation
-                        //            .stop();
-                        //    });
                         animation.progress(0.0).apply().pause();
+                        //setTimeout(function () { handlePauseStateDisplay(animation['node']) }, 250)
                     })
-                    //queueAnimationSet.forEach(function (animation) { animation.pause() })
                     $("#pause").addClass('hidden');
                     $("#play").removeClass('hidden');
                 }
@@ -1263,7 +1334,7 @@
                                 + '<p> Limit: ' + limit + '</p>'
                                 + '<p> Queue: ' + queueString + '</p>'
                                 + '</div > <div class="alert alert-success" role="alert">Transaction Information: <hr>' + transactionInfo + '</div>'
-                            
+
                             var $menuContents = $(menuString);
                             var $ctr = $('<div class="select-buttons"></div>');
                             var $inactive = $('<button id="inactive" class="btn btn-sm btn-primary center-block">Inactivate</button>');
@@ -1402,7 +1473,7 @@
                 var pathToTruncate = Object.values(aStar.path);
                 var truncatedPath = truncatePath(pathToTruncate);
                 truncatedPath = reorderPath(truncatedPath);
-                
+
                 // The return path is simply the reverse of the original path with the first element removed
                 // so the processing center doesn't animate twice.
                 //var returnPath = truncatedPath.slice(0);
@@ -1415,7 +1486,7 @@
                     var temp = getOneWayPath(endNode, finalDestination);
                     path = path.concat(temp);
                 }
-                
+
                 return path;
             }
 
