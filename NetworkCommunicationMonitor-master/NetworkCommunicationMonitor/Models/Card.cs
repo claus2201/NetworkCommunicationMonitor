@@ -195,7 +195,7 @@ namespace NetworkCommunicationMonitor.Models
             int amount;
             using (cn1)
             {
-                string _sql1 = @"SELECT COUNT(card_id) FROM Card WHERE card_id = " + cardID;
+                string _sql1 = @"SELECT COUNT(card_id) FROM Card WHERE card_id = '" + cardID + "'";
                 var cmd1 = new SqlCommand(_sql1, cn1);
                 amount = (int)cmd1.ExecuteScalar();
                 cn1.Open();
